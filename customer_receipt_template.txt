@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<style type="text/css">
+body {
+	font-family: Arial;
+}
+</style>
+</head>
+<body>
+<p>Your order has been placed.</p>
+
+<p>{{ shipping.first_name }} {{ shipping.last_name }}<br>
+{% if shipping.company %}{{ shipping.company }}<br>{% endif %}
+{{ shipping.address1 }}<br>
+{% if shipping.address2 %}{{ shipping.address2 }}<br>{% endif %}
+{{ shipping.city }}, {{ shipping.state }} {{ shipping.postal_code }}<br>
+{{ shipping.country }}</p>
+
+<p>
+<strong>Order ID: </strong>{{ source_id }}<br>
+<strong>Order Date: </strong>{{ date_added|date_modify("+0 hours")|date("m/d/Y", store_timezone) }}<br>
+</p>
+
+<ul>
+{% for item in order_items %}
+	<li>
+	<b>{{ item.name }}</b><br>
+	Price {{ item.price }}<br>
+	SKU: {{ item.code }}<br>
+	Quantity: {{ item.quantity }}
+	</li>
+	{% if item.variation_list|length > 0 %}
+		<ul>
+
+		{% for key, val in item.variation_list %}
+			<li>{{ key }}: {{ val }}</li>
+		{% endfor %}
+
+		</ul>
+	{% endif %}
+{% endfor %}
+</ul>
+
+<p>
+<b>Subtotal:</b> {{ product_total|money_format }}<br>
+<b>Shipping:</b> {{ shipping_total|money_format }}<br>
+<b>Tax:</b> {{ tax_total|money_format }}<br>
+
+				{% if discount_list|length > 0 %}
+					{% for discount in discount_list %}
+						<b>{{ discount.name|e }}:</b> {{ discount.amount|money_format }}
+					{% endfor %}
+				{% endif %}
+
+<b>Total:</b> {{ order_total|money_format }}
+</p>
+
+<p>Thank you,</p>
+
+<p><i>{{ store_name }}</i></p>
+</body>
+</html>
