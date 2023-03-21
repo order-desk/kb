@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ store_name }} Receipt</title>
+<link rel="stylesheet" href="{{ base_url }}/css/receipt.css">
+
+<style type="text/css">
+/* CUSTOM CSS HERE */
+
+
+</style>
+</head>
+
+<body id="printpage">
+
+<a href="#" onclick="window.print(); return false;" id="printbutton" class="btn noprint">Print</a>
+
+{% for key, order in orders %}
+
+{{ key > 0 ? '<div class="page-break"></div>' }}
+<div class="main">
+
+	{# This is a good place to put in a logo if you want should be https: #}
+	{# <img src="your_image_url" alt="{{ store_name|e }}"> #}
+	<div class="header_logo">{{ store_name }}</div>
+
+	<div class="wrapper">
+		<div class="wrapper-table">
+			<ul>
+				<li class="invoice-title">Receipt</li>
+				<li>&nbsp;</li>
+				<li><b>Date:</b> {{ order.date_added|date_modify("+0 hours")|date(store_date_format, store_timezone) }}</li>
+				<li><b>Order Number:</b> {{ order.source_id }}</li>
+				<li><b>Email:</b> {{ order.email }}</li>
+				{% if order.shipping.phone %}<li><b>Phone:</b> {{ order.shipping.phone }}</li>{% endif %}
+				{% if order.shipping_method %}<li><b>Shipping:</b> {{ order.shipping_method }}</li>{% endif %}
+
+				{# Checkout Data #}
+				{% if order.checkout_data|length > 0 %}
+					{% for key, val in order.checkout_data %}
+					<li><b>{{ key }}:</b> {{ val }}</li>
+					{% endfor %}
+				{% endif %}
+			</ul>
+			<br>
+
+			<table class="address_table" cellpadding="0" cellspacing="0" border="0">
+				<tbody>
+					<tr>
+						<td>
+							<b>Invoice Address:</b><br />
+							{{ order.customer.first_name }} {{ order.customer.last_name }}<br>
+							{% if order.customer.company %}{{ order.customer.company }}<br>{% endif %}
+							{{ order.customer.address1 }}<br>
+							{% if order.customer.address2 %}{{ order.customer.address2 }}<br>{% endif %}
+							{{ order.customer.city }}, {{ order.customer.state }} {{ order.customer.postal_code }}<br>
+							{{ order.customer.country != store_country ? order.customer.country }}<br>
+						</td>
+						<td>
+							<b>Shipping Address:</b><br />
+							{{ order.shipping.first_name }} {{ order.shipping.last_name }}<br>
+							{% if order.shipping.company %}{{ order.shipping.company }}<br>{% endif %}
+							{{ order.shipping.address1 }}<br>
+							{% if order.shipping.address2 %}{{ order.shipping.address2 }}<br>{% endif %}
+							{% if order.shipping.address3 %}{{ order.shipping.address3 }}<br>{% endif %}
+							{% if order.shipping.address4 %}{{ order.shipping.address4 }}<br>{% endif %}
+							{{ order.shipping.city }}, {{ order.shipping.state }} {{ order.shipping.postal_code }}<br>
+							{{ order.shipping.country != store_country ? order.shipping.country }}<br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{# Show Products #}
+			<table class="product_table" cellpadding="5" cellspacing="5" border="0">
+				<thead>
+					<tr>
+						<th class="product_header">Product</td>
+						<th class="price_header" class="short_cell">Price</th>
+						<th class="qty_header" class="short_cell">Qty</th>
+						<th class="subtotal_header product_total_price_header" class="short_cell">Subtotal</th>
+					</tr>
+				</thead>
+				<tbody>
+				{# List of Items in Order #}
+				{% for item in order.order_items %}
+					<tr>
+						<td>
+							{{ item.name }}
+				                        <img src="{{ item.code|barcode("C128", 2, 80) }}">
+							
+							{# Checkout Data and Variations #}
+							{% if item.variation_list|length > 0 %}
+								<ul>
+								{% for key, val in item.variation_list %}
+									<li><b>{{ key }}:</b> {{ val }}</li>
+								{% endfor %}
+								</ul>
+							{% endif %}
+						</td>
+
+						<td>{{ item.price|money_format }}</td>
+						<td>{{ item.quantity }}</td>
+						<td>{{ (item.quantity * item.price)|money_format }}</td>
+					</tr>
+				{% endfor %}
+
+				{# Show Totals #}
+
+				{% if order.shipping_total > 0 %}
+				<tr>
+					<td colspan="3" align="right"><b>Shipping:</b></td>
+					<td>{{ order.shipping_total|money_format }}</td>
+				</tr>
+				{% endif %}
+
+				{% if order.tax_total > 0 %}
+				<tr>
+					<td colspan="3" align="right"><b>Tax:</b></td>
+					<td>{{ order.tax_total|money_format }}</td>
+				</tr>
+				{% endif %}
+				{% if order.discount_list|length > 0 %}
+					{% for discount in order.discount_list %}
+					<tr>
+						<td colspan="3" align="right"><b>{{ discount.name|e }}:</b></td>
+						<td>{{ discount.amount|money_format }}</td>
+					</tr>
+					{% endfor %}
+				{% endif %}
+
+				<tr>
+					<td colspan="3" align="right"><b>Total:</b></td>
+					<td>{{ order.order_total|money_format }}</td>
+				</tr>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{# Show a Nice Shadow Image at the Bottom of The Table #}
+	<div class="shadowimg"><img src="{{ base_url }}/images/paper-shadow.png" width="505" height="8" alt="shadow" /></div>
+
+	{# This is a nice place to put a thank-you message #}
+	<p class="receipt_footer"></p>
+</div>
+
+
+{% endfor %}
+
+
+</body>
+</html>
