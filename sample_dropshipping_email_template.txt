@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<style type="text/css">
+body {
+        font-family: Arial;
+}
+</style>
+</head>
+<body>
+<p>Please fulfill the following order for {{ store_name }}:</p>
+ 
+<p>{{ shipping.first_name }} {{ shipping.last_name }}<br>
+{% if shipping.company %}{{ shipping.company }}<br>{% endif %}
+{{ shipping.address1 }}<br>
+{% if shipping.address2 %}{{ shipping.address2 }}<br>{% endif %}
+{{ shipping.city }}, {{ shipping.state }} {{ shipping.postal_code }}<br>
+{{ shipping.country }}</p>
+ 
+<p>
+<strong>Order ID: </strong>{{ source_id }}<br>
+<strong>Order Date: </strong>{{ date_added|date_modify("+0 hours")|date("m/d/Y", store_timezone) }}<br>
+</p>
+ 
+<ul>
+{% for item in order_items %}
+        <li>
+        <b>{{ item.name }}</b><br>
+        SKU: {{ item.code }}<br>
+        Quantity: {{ item.quantity }}
+        </li>
+        {% if item.variation_list|length > 0 %}
+                <ul>
+ 
+                {% for key, val in item.variation_list %}
+                        <li>{{ key }}: {{ val }}</li>
+                {% endfor %}
+ 
+                </ul>
+        {% endif %}
+{% endfor %}
+</ul>
+
+<p>Please click this link to confirm or enter tracking details: <a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+
+{# <p><a href="{{ id|receipt_link(0) }}">Print Packing Slip</a></p> #}
+
+<p>Thank you,</p>
+ 
+<p><i>{{ store_name }}</i></p>
+</body>
+</html>
