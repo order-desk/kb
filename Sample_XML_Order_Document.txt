@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders>
+{% for key, order in orders %}
+    <order>
+        <source_id>{{ order.source_id|e }}</source_id>
+        <first_name>{{ order.shipping.first_name|e }}</first_name>
+        <last_name>{{ order.shipping.last_name|e }}</last_name>
+        <address1>{{ order.shipping.address1|e }}</address1>
+        <address2>{{ order.shipping.address21|e }}</address2>
+        <city>{{ order.shipping.city|e }}</city>
+        <state>{{ order.shipping.state|e }}</state>
+        <zip>{{ order.shipping.zip|e }}</zip>
+        <country>{{ order.shipping.country|e }}</country>
+        <phone>{{ order.shipping.phone|e }}</phone>
+        <order_items>
+		{% for item in order.order_items %}
+			  <order_item>
+			      <sku>{{ item.code|e }}</sku>
+			      <quantity>{{ item.quantity|e }}</quantity>
+			  </order_item>
+		{% endfor %}
+		</order_items>
+	</order>
+{% endfor %}
+</orders>
